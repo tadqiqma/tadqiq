@@ -48,6 +48,12 @@ function h(tag,attrs,...kids){const e=document.createElement(tag);for(const k in
 const norm=s=>String(s||'').replace(/[ً-ْٰـ]/g,'').replace(/[“”«»„"]/g,'"').replace(/\s+/g,' ').trim();
 const put=(el,...kids)=>kids.flat().forEach(k=>{if(k!=null&&k!==false)el.append(k)});
 const pct=(a,b)=>b?Math.round(a/b*1000)/10:0;
+function outletVal(){const s=$('m-outlet').value;if(s==='آخر'){const o=$('m-outlet-other').value.trim();return o?'آخر: '+o:'آخر'}return s}
+function setOutlet(v){const s=$('m-outlet'),o=$('m-outlet-other');v=typeof v==='string'?v.slice(0,120):'';
+  const opts=[...s.options].map(x=>x.value);
+  if(opts.includes(v)&&v!=='آخر'){s.value=v;o.value=''}
+  else if(v){s.value='آخر';o.value=v.replace(/^آخر:\s*/,'').slice(0,80)}else{s.value='';o.value=''}
+  o.hidden=s.value!=='آخر'}
 function msg(t,warn){const m=$('msg');m.textContent=t||'';m.style.color=warn?'var(--flag)':'var(--mute)'}
 
 /* ---------- الحساب ---------- */
@@ -141,18 +147,18 @@ function renderSummary(){
   const pend=S.passages.reduce((n,p)=>n+p.inds.filter(i=>i.s==='suggested').length,0);
   const auto=S.passages.reduce((n,p)=>n+p.inds.filter(i=>i.auto&&i.s==='confirmed').length,0);
   box.append(
-    h('div',{class:'stats'},
-      h('div',{class:'stat'},h('b',null,String(r.N)),h('span',null,'مقاطع قابلة للتحقق (الأفضل '+S.th.min+' فأكثر)')),
-      h('div',{class:'stat'},h('b',{style:'color:var(--flag)'},r.camo+' / '+r.N),h('span',null,'مقاطع مموهة مؤكدة')),
-      h('div',{class:'stat'},h('b',null,r.rate+'%'),h('span',null,'نسبة التمويه (العتبة '+S.th.rate+'%)'),h('div',{class:'bar'},h('i',{style:'width:'+Math.min(100,r.rate)+'%'}))),
-      h('div',{class:'stat'},h('b',null,r.exitScore+' / 8'),h('span',null,'درجة الخروج (العتبة '+S.th.exit+')'))
-    ),
     h('div',{class:'verdict '+r.cls},
       h('div',{class:'lab'},r.label),
       h('p',{class:'sumtxt'},summaryText(r,activeStats())),
       !r.enough&&r.N>0?h('p',{class:'note',style:'margin:6px 0 0'},'نتيجة هذا النص وحده، وعدد مقاطعه القابلة للتحقق قليل ('+r.N+' من '+S.th.min+' فأكثر للاستقرار)، فيكفي تغيير مقطع واحد لتتبدل النسبة. اعتمدها قرينة لا حكما.'):h('p',{class:'note',style:'margin:6px 0 0'},'الحكم وصفي يخص هذا النص وحده بحسب الشبكة، ولا يقال عن كاتبه أو منبره شيء.'),
       pend?h('p',{class:'note',style:'margin:6px 0 0'},'بانتظار قرارك: '+pend+' مؤشر. لو اعتمدت المقترحات النصية كلها لبلغت النسبة '+r.rateProv+'%.'):null,
       auto?h('p',{class:'note',style:'margin:6px 0 0'},'اعتمد تلقائيا '+auto+' مؤشر لبلوغ ثقته '+S.th.conf+'% فأكثر، ويمكنك رفضها بالضغط عليها.'):null
+    ),
+    h('div',{class:'stats'},
+      h('div',{class:'stat'},h('b',null,String(r.N)),h('span',null,'مقاطع قابلة للتحقق (الأفضل '+S.th.min+' فأكثر)')),
+      h('div',{class:'stat'},h('b',{style:'color:var(--flag)'},r.camo+' / '+r.N),h('span',null,'مقاطع مموهة مؤكدة')),
+      h('div',{class:'stat'},h('b',null,r.rate+'%'),h('span',null,'نسبة التمويه (العتبة '+S.th.rate+'%)'),h('div',{class:'bar'},h('i',{style:'width:'+Math.min(100,r.rate)+'%'}))),
+      h('div',{class:'stat'},h('b',null,r.exitScore+' / 8'),h('span',null,'درجة الخروج (العتبة '+S.th.exit+')'))
     )
   );
 }
@@ -388,7 +394,7 @@ function reportText(){
   const r=compute(),m=k=>$(k).value||'-';
   const L=[];
   L.push('# تقرير تدقيق الخطاب','');
-  L.push('- المنبر: '+m('m-outlet'),'- تاريخ النشر: '+m('m-date'),'- الرابط: '+m('m-link'),'- شكل المادة: '+m('m-genre')+' | الهدف: '+m('m-target')+' | النبرة: '+m('m-dir')+' | انتماء الهدف: '+m('m-pos')+($('asr').checked?' | تفريغ آلي':''),'');
+  L.push('- المنبر: '+(outletVal()||'-'),'- تاريخ النشر: '+m('m-date'),'- الرابط: '+m('m-link'),'- شكل المادة: '+m('m-genre')+' | الهدف: '+m('m-target')+' | النبرة: '+m('m-dir')+' | انتماء الهدف: '+m('m-pos')+($('asr').checked?' | تفريغ آلي':''),'');
   L.push('## النتيجة (وصفية، بحسب هذه الشبكة)');
   L.push('- مقاطع قابلة للتحقق: '+r.N+(r.enough?'':' (أقل من '+S.th.min+': النسبة غير مستقرة، فهي قرينة لا حكم)'));
   L.push('- مقاطع مموهة: '+r.camo+' ('+r.rate+'%)');
@@ -439,7 +445,7 @@ function exportCSV(){
   save('tadqiq-indicators.csv','\ufeff'+rows.map(r=>r.map(q).join(',')).join('\n'));
 }
 const exportReport=()=>save('tadqiq-report.md',reportText());
-const exportJSON=()=>save('tadqiq-data.json',JSON.stringify({fmt:'tadqiq-report/1',engine:RULES.version,text:$('text').value,meta:{outlet:$('m-outlet').value,link:$('m-link').value,genre:$('m-genre').value,date:$('m-date').value,target:$('m-target').value,direction:$('m-dir').value,position:$('m-pos').value,asr:$('asr').checked},thresholds:S.th,refs:S.refs,passages:S.passages,exits:S.exits,flags:S.flags,result:compute()},null,1));
+const exportJSON=()=>save('tadqiq-data.json',JSON.stringify({fmt:'tadqiq-report/1',engine:RULES.version,text:$('text').value,meta:{outlet:outletVal(),link:$('m-link').value,genre:$('m-genre').value,date:$('m-date').value,target:$('m-target').value,direction:$('m-dir').value,position:$('m-pos').value,asr:$('asr').checked},thresholds:S.th,refs:S.refs,passages:S.passages,exits:S.exits,flags:S.flags,result:compute()},null,1));
 
 
 /* ---------- استيراد تقرير محفوظ ---------- */
@@ -459,7 +465,8 @@ function importReport(d){
   if(!passages.length)throw new Error('empty');
   passages.forEach((p,i)=>p.id=i+1);
   const m=d.meta||{};
-  [['m-outlet','outlet'],['m-link','link'],['m-genre','genre'],['m-date','date'],['m-target','target'],['m-dir','direction'],['m-pos','position']].forEach(([id,k])=>{const el=$(id);if(el&&m[k]!=null)el.value=str(m[k],300)});
+  [['m-link','link'],['m-genre','genre'],['m-date','date'],['m-target','target'],['m-dir','direction'],['m-pos','position']].forEach(([id,k])=>{const el=$(id);if(el&&m[k]!=null)el.value=str(m[k],300)});
+  setOutlet(m.outlet);
   $('asr').checked=!!m.asr;$('text').value=d.text;
   const th=d.thresholds||{};for(const k of Object.keys(S.th)){const v=parseFloat(th[k]);if(Number.isFinite(v)&&v>=0&&v<=1000)S.th[k]=v}
   if(Array.isArray(d.refs)){S.refs=d.refs.slice(0,100).map(r=>({id:parseInt(r&&r.id),title:str(r&&r.title,200),link:/^https?:\/\//i.test(r&&r.link||'')?str(r.link,500):'',note:str(r&&r.note,300),text:str(r&&r.text,6000)})).filter(r=>Number.isFinite(r.id)&&r.title);saveRefs();renderRefs()}
@@ -576,12 +583,27 @@ function renderGuide(){
 $('go').addEventListener('click',analyze);
 $('stop').addEventListener('click',()=>ctl&&ctl.abort());
 $('demo').addEventListener('click',loadDemo);
-$('file').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$('text').value=String(r.result||'');msg('تم تحميل الملف: '+f.name)};r.readAsText(f,'utf-8')});
+async function loadInto(file,target,limit,done,forceOcr){
+  const note=$('read-note');if(note){note.hidden=true;note.textContent=''}
+  try{
+    const r=await Readers.read(file,{status:t=>msg(t),forceOcr:!!forceOcr});
+    let t=r.text;if(limit&&t.length>limit){t=t.slice(0,limit)}
+    target.value=t;msg('تم تحميل الملف: '+file.name);
+    if(note&&(r.notes.length||r.review)){
+      note.hidden=false;note.textContent=(r.notes.join(' ')+' راجع النص أدناه وصححه قبل الفحص.').trim();
+      if(r.kind==='pdf'&&!r.ocr){const b=h('button',{type:'button',style:'margin-top:8px;display:block'},'النص مشوه؟ اقرأ الملف بالتعرف الضوئي');b.addEventListener('click',()=>loadInto(file,target,limit,done,true));note.append(b)}
+    }
+    if(done)done(file);
+  }catch(e){msg(Readers.errText(e),true)}
+}
+$('file').addEventListener('change',e=>{const f=e.target.files[0];if(f)loadInto(f,$('text'))});
 if(window.Auth)Auth.init();
 if(window.CONFIG&&CONFIG.AI_ENDPOINT)$('ai-wrap').hidden=false;
 $('r-add').addEventListener('click',addRef);
 $('c-add').addEventListener('click',addCustom);
 $('preset').addEventListener('change',applyPreset);
-$('r-file').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$('r-text').value=String(r.result||'').slice(0,6000);if(!$('r-title').value)$('r-title').value=f.name.replace(/\.[^.]+$/,'');msg('حمل ملف المرجع (يؤخذ منه أول 6000 حرف).')};r.readAsText(f,'utf-8')});
+$('r-file').addEventListener('change',e=>{const f=e.target.files[0];if(f)loadInto(f,$('r-text'),6000,()=>{if(!$('r-title').value)$('r-title').value=f.name.replace(/\.[^.]+$/,'')})});
 loadRefs();renderRefs();renderGuide();renderPicker();renderResults();
 $('ver').textContent=RULES.version;
+document.querySelectorAll('label.pick input[type=file]').forEach(i=>i.addEventListener('change',()=>{const f=i.closest('label').querySelector('.fn');if(f&&i.files[0])f.textContent=i.files[0].name}));
+$('m-outlet').addEventListener('change',()=>{const o=$('m-outlet-other');o.hidden=$('m-outlet').value!=='آخر';if(!o.hidden)o.focus()});

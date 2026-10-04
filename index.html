@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data:; font-src 'self'; connect-src 'self' https:; frame-src https://accounts.google.com/gsi/; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://accounts.google.com/gsi/client; worker-src 'self'; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data:; font-src 'self'; connect-src 'self' https:; frame-src https://accounts.google.com/gsi/; object-src 'none'; base-uri 'none'; form-action 'self'">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232B4A9B'/%3E%3Cpath d='M16 4l3.2 6.4L26 8.5l-1.9 6.8L28 16l-3.9.7L26 23.5l-6.8-1.9L16 28l-3.2-6.4L6 23.5l1.9-6.8L4 16l3.9-.7L6 8.5l6.8 1.9z' fill='%23fff'/%3E%3C/svg%3E">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -13,11 +13,14 @@
 <body>
 <div id="app" lang="ar" dir="rtl">
   <nav class="topnav" aria-label="التنقل"><a href="index.html" aria-current="page">الأداة</a><a href="dalil-alistikhdam.pdf" download class="pdf">دليل الاستخدام (PDF)</a><a href="public.html">النتائج المفتوحة</a><a href="about.html">عن الأداة</a></nav>
-  <header>
+  <header class="hero">
     <div>
       <h1>أداة تدقيق الخطاب</h1>
       <p>أداة مساعدة تكشف تقنيات الإيهام في النصوص الصحفية والتفريغات، وتدل القارئ على ما يجب أن يتحقق منه بنفسه. تعمل كلها داخل متصفحك: لا يغادر النص جهازك. <a href="about.html">عن الأداة ومنهجها وحدودها</a></p>
+      <ol class="steps"><li>الصق النص</li><li>راجع المقترحات وأكد أو ارفض</li><li>نزّل النتيجة</li></ol>
+      <a class="cta" href="#input">ابدأ بلصق نص</a>
     </div>
+    <figure class="spec" aria-hidden="true"><blockquote>قال المتحدث: <mark>لا أتهم أحدا</mark>، لكن الأرقام تتحدث عن نفسها.</blockquote><figcaption>قرينة: عبارة استباقية قبل مقطع غير موثق</figcaption></figure>
     <span class="tag">نموذج مفتوح</span>
   </header>
 
@@ -25,19 +28,21 @@
     <div class="card">
       <h2>1. النص المراد تدقيقه</h2>
       <div class="grid" style="margin-bottom:12px">
-        <label>اسم المنبر أو البرنامج<input type="text" id="m-outlet" placeholder="الموقع أو القناة أو البرنامج"></label>
+        <label>المنبر أو البرنامج<select id="m-outlet"><option value="">اختر نوع المنبر</option><option>جريدة إلكترونية</option><option>منشور فيسبوك</option><option>بودكاست</option><option>ريلز</option><option>آخر</option></select>
+          <input type="text" id="m-outlet-other" hidden maxlength="80" placeholder="حدد المنبر أو البرنامج" aria-label="تحديد المنبر الآخر" style="margin-top:6px"></label>
         <label>تاريخ النشر<input type="date" id="m-date"></label>
         <label>رابط المادة<input type="text" id="m-link" inputmode="url" dir="ltr" placeholder="https://"></label>
       </div>
       <label for="text">نص المقال أو تفريغ الفيديو
         <textarea id="text" rows="9" placeholder="الصق النص هنا، أو ارفع ملفا نصيا"></textarea></label>
-      <div class="row" style="margin-top:10px">
-        <label style="flex-direction:row;align-items:center;gap:6px"><span>أو ارفع ملفا نصيا (txt أو md)</span><input type="file" id="file" accept=".txt,.md,text/plain"></label>
-        <label style="flex-direction:row;align-items:center;gap:6px"><span>أو افتح تقريرا محفوظا (JSON)</span><input type="file" id="imp-file" accept=".json,application/json"></label>
+      <div class="picks">
+        <label class="pick"><b>ارفع ملفا</b><span class="fn">نص، Word، PDF، صورة</span><input type="file" id="file" accept=".txt,.md,.docx,.pdf,.png,.jpg,.jpeg,.webp,text/plain,application/pdf,image/png,image/jpeg,image/webp"></label>
+        <label class="pick"><b>افتح تقريرا محفوظا</b><span class="fn">JSON</span><input type="file" id="imp-file" accept=".json,application/json"></label>
         <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="asr"><span>هذا تفريغ آلي (تعاد مقابلة الأرقام والأسماء بالتسجيل)</span></label>
         <label id="ai-wrap" hidden style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="ai"><span>تحليل معمق بخدمة ذكاء اصطناعي (يرسل النص إلى الخادم المعد لذلك)</span></label>
       </div>
-      <h3 style="margin:18px 0 6px">ماذا تريد أن تفحص؟</h3>
+      <p id="read-note" class="note read-note" role="status" hidden></p>
+      <h3 class="mag" style="margin:18px 0 6px">ماذا تريد أن تفحص؟</h3>
       <label>نوع الفحص
         <select id="preset">
           <option value="all">فحص شامل بكل المؤشرات (وحده يصدر تصنيفا)</option>
@@ -106,7 +111,7 @@
       </div>
       <label style="margin-top:12px">نص المرجع أو مقطع منه (اختياري، ليقابل به النموذج النص حرفيا)
         <textarea id="r-text" rows="4" placeholder="الصق المقطع ذا الصلة من التقرير أو البلاغ أو النتائج، أو ارفع ملفا نصيا"></textarea></label>
-      <div class="row" style="margin-top:8px"><label style="flex-direction:row;align-items:center;gap:6px"><span>ملف نصي للمرجع</span><input type="file" id="r-file" accept=".txt,.md,text/plain"></label></div>
+      <div class="row" style="margin-top:8px"><label class="pick"><b>ملف للمرجع</b><span class="fn">نص، Word، PDF</span><input type="file" id="r-file" accept=".txt,.md,.docx,.pdf,text/plain,application/pdf"></label></div>
       <div class="row" style="margin-top:10px"><button id="r-add">أضف المرجع</button></div>
     </div>
   </section>
@@ -122,6 +127,7 @@
 <script src="mode.js"></script>
 <script src="auth.js"></script>
 <script src="engine.js"></script>
+<script src="readers.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
