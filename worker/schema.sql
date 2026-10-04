@@ -1,0 +1,53 @@
+CREATE TABLE IF NOT EXISTS rec(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  batch TEXT NOT NULL,
+  ind INTEGER NOT NULL,
+  cue TEXT NOT NULL,
+  decision TEXT NOT NULL,
+  engine TEXT,
+  mode TEXT,
+  month TEXT,
+  genre TEXT,
+  ts INTEGER,
+  status TEXT NOT NULL DEFAULT 'ok'
+);
+CREATE INDEX IF NOT EXISTS rec_batch ON rec(batch);
+CREATE TABLE IF NOT EXISTS bat(
+  fp TEXT PRIMARY KEY,
+  batch TEXT NOT NULL,
+  ts INTEGER
+);
+CREATE INDEX IF NOT EXISTS rec_cue ON rec(ind,cue);
+CREATE TABLE IF NOT EXISTS msg(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts INTEGER,
+  text TEXT NOT NULL,
+  contact TEXT,
+  user_id TEXT
+);
+CREATE TABLE IF NOT EXISTS users(
+  id TEXT PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  provider TEXT,
+  created INTEGER,
+  terms_version TEXT,
+  terms_at INTEGER,
+  last_login INTEGER
+);
+CREATE TABLE IF NOT EXISTS sessions(
+  token_hash TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  exp INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS otp(
+  email TEXT PRIMARY KEY,
+  code_hash TEXT NOT NULL,
+  exp INTEGER NOT NULL,
+  tries INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS rl(
+  h TEXT NOT NULL,
+  day TEXT NOT NULL,
+  n INTEGER NOT NULL,
+  PRIMARY KEY(h,day)
+);
