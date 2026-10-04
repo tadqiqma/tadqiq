@@ -1,0 +1,12 @@
+name = "tadqiq-api"
+main = "index.js"
+compatibility_date = "2025-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tadqiq"
+database_id = "ضع-هنا-معرف-القاعدة"
+
+[vars]
+# عناوين الموقع المسموح لها بالإرسال، مفصولة بفاصلة (بلا شرطة في النهاية)
+ALLOWED_ORIGIN = "https://اسمك.github.io"
