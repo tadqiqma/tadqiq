@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data:; font-src 'self'; connect-src 'self' https:; frame-src https://accounts.google.com/gsi/; object-src 'none'; base-uri 'none'; form-action 'self'">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232B4A9B'/%3E%3Cpath d='M16 4l3.2 6.4L26 8.5l-1.9 6.8L28 16l-3.9.7L26 23.5l-6.8-1.9L16 28l-3.2-6.4L6 23.5l1.9-6.8L4 16l3.9-.7L6 8.5l6.8 1.9z' fill='%23fff'/%3E%3C/svg%3E">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>أداة تدقيق الخطاب</title>
+<meta name="description" content="أداة مساعدة تكشف تقنيات الإيهام في النصوص الصحفية والتفريغات، وتدل القارئ على ما يجب أن يتحقق منه بنفسه.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app" lang="ar" dir="rtl">
+  <nav class="topnav" aria-label="التنقل"><a href="index.html" aria-current="page">الأداة</a><a href="dalil-alistikhdam.pdf" download class="pdf">دليل الاستخدام (PDF)</a><a href="public.html">النتائج المفتوحة</a><a href="about.html">عن الأداة</a></nav>
+  <header>
+    <div>
+      <h1>أداة تدقيق الخطاب</h1>
+      <p>أداة مساعدة تكشف تقنيات الإيهام في النصوص الصحفية والتفريغات، وتدل القارئ على ما يجب أن يتحقق منه بنفسه. تعمل كلها داخل متصفحك: لا يغادر النص جهازك. <a href="about.html">عن الأداة ومنهجها وحدودها</a></p>
+    </div>
+    <span class="tag">نموذج مفتوح</span>
+  </header>
+
+  <section id="input">
+    <div class="card">
+      <h2>1. النص المراد تدقيقه</h2>
+      <div class="grid" style="margin-bottom:12px">
+        <label>اسم المنبر أو البرنامج<input type="text" id="m-outlet" placeholder="الموقع أو القناة أو البرنامج"></label>
+        <label>تاريخ النشر<input type="date" id="m-date"></label>
+        <label>رابط المادة<input type="text" id="m-link" inputmode="url" dir="ltr" placeholder="https://"></label>
+      </div>
+      <label for="text">نص المقال أو تفريغ الفيديو
+        <textarea id="text" rows="9" placeholder="الصق النص هنا، أو ارفع ملفا نصيا"></textarea></label>
+      <div class="row" style="margin-top:10px">
+        <label style="flex-direction:row;align-items:center;gap:6px"><span>أو ارفع ملفا نصيا (txt أو md)</span><input type="file" id="file" accept=".txt,.md,text/plain"></label>
+        <label style="flex-direction:row;align-items:center;gap:6px"><span>أو افتح تقريرا محفوظا (JSON)</span><input type="file" id="imp-file" accept=".json,application/json"></label>
+        <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="asr"><span>هذا تفريغ آلي (تعاد مقابلة الأرقام والأسماء بالتسجيل)</span></label>
+        <label id="ai-wrap" hidden style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="ai"><span>تحليل معمق بخدمة ذكاء اصطناعي (يرسل النص إلى الخادم المعد لذلك)</span></label>
+      </div>
+      <h3 style="margin:18px 0 6px">ماذا تريد أن تفحص؟</h3>
+      <label>نوع الفحص
+        <select id="preset">
+          <option value="all">فحص شامل بكل المؤشرات (وحده يصدر تصنيفا)</option>
+          <option value="num">الأرقام والإحصاءات</option>
+          <option value="src">المصادر والإسناد</option>
+          <option value="fra">الإيحاء والتأطير</option>
+          <option value="custom">اختيار يدوي</option>
+        </select></label>
+      <div class="checks" id="picker" role="group" aria-label="المؤشرات المفحوصة"></div>
+      <p class="note" id="presetnote" style="margin:4px 0 0"></p>
+      <details style="margin-top:8px">
+        <summary>أضف مؤشرا خاصا بك</summary>
+        <div class="th">
+          <label>اسم المؤشر<input type="text" id="c-name" placeholder="مثال: الاستشهاد بمجهول الحال"></label>
+          <label>الشرط (متى يحسب؟)<input type="text" id="c-cond" placeholder="صف الحالة بدقة بحيث يمكن التحقق منها في النص"></label>
+          <label>الوزن<select id="c-w"><option value="1">1 (عادي)</option><option value="2">2 (مرتفع)</option></select></label>
+          <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="c-bench"><span>لا يثبت دون مرجع خارجي</span></label>
+        </div>
+        <div class="row" style="margin-top:8px"><button id="c-add">أضف المؤشر</button></div>
+      </details>
+      <div class="row" style="margin-top:14px">
+        <button class="primary" id="go">حلل النص</button>
+        <button id="stop" hidden>إيقاف</button>
+        <button id="demo">عرض مثال توضيحي</button>
+      </div>
+      <div class="prog" id="prog" hidden><i></i></div>
+      <div id="msg" class="note" aria-live="polite"></div>
+      <details style="margin-top:8px">
+        <summary>معلومات إضافية عن المادة (اختيارية)</summary>
+        <div class="th">
+          <label>شكل المادة<select id="m-genre"><option value="">غير محدد</option><option>مقال</option><option>تعليق</option><option>حلقة مصورة أو صوتية</option><option>خبر</option></select></label>
+          <label>من يستهدفه النص؟<select id="m-target"><option value="">غير محدد</option><option>شخص</option><option>جهة أو مؤسسة</option><option>صورة الدولة في الخارج</option></select></label>
+          <label>نبرة النص تجاه هدفه<select id="m-dir"><option value="">غير محدد</option><option>ذم</option><option>مدح</option><option>محايدة</option></select></label>
+          <label>انتماء الهدف<select id="m-pos"><option value="">غير محدد</option><option>الحكومة</option><option>المعارضة</option><option>مؤسسة من مؤسسات الدولة</option></select></label>
+        </div>
+        <p class="note">هذه المعلومات لا تدخل في الحساب، وتفيد في مقارنة النصوص لاحقا.</p>
+      </details>
+      <details style="margin-top:8px">
+        <summary>العتبات (تقفل عند أول تحليل)</summary>
+        <div class="th">
+          <label>درجة المقطع المموه<input type="number" id="t-pass" value="2" min="1"><span class="hint">مجموع أوزان المؤشرات المؤكدة في المقطع. يعد المقطع مموها عند بلوغها.</span></label>
+          <label>نسبة التمويه المرتفعة %<input type="number" id="t-rate" value="10" min="1" max="100"><span class="hint">حصة المقاطع المموهة من القابلة للتحقق. ما بلغها فهو مرتفع.</span></label>
+          <label>درجة الخروج المرتفعة (من 8)<input type="number" id="t-exit" value="5" min="1" max="8"><span class="hint">عدد علامات الأمانة الممارسة فعلا.</span></label>
+          <label>أدنى عدد مقاطع لاستقرار النتيجة<input type="number" id="t-min" value="10" min="1"><span class="hint">تحت هذا العدد تحتسب النتيجة لكن تعرض مع تنبيه لأن مقطعا واحدا يغيرها. يكفي نص واحد لاستعمال الأداة.</span></label>
+          <label>عتبة الاعتماد المباشر (ثقة %)<input type="number" id="t-conf" value="85" min="50" max="100"><span class="hint">مؤشر مقترح تبلغ ثقته هذه القيمة يعتمد دون ضغط. قرائن القواعد لا تتجاوز غالبا 75%، فلا يعتمد بها شيء تلقائيا إلا مع التحليل المعمق.</span></label>
+          <label>عتبة اطراد المؤشر %<input type="number" id="t-ind" value="20" min="1" max="100"><span class="hint">مؤشر يظهر في هذه النسبة من المقاطع القابلة للتحقق يعد مطردا ومعتدا به في النص.</span></label>
+        </div>
+        <p class="note">تكتب العتبات قبل أول ترميز ولا تعدل بعد رؤية النتائج. لبدء تحليل بعتبات أخرى أعد تحميل الصفحة.</p>
+      </details>
+      <details style="margin-top:8px">
+        <summary>دليل المؤشرات: تعريف كل مؤشر وشرطه واستثناؤه</summary>
+        <div class="guide" id="guide"></div>
+      </details>
+    </div>
+  </section>
+
+  <section id="refs">
+    <div class="card">
+      <h2>2. المراجع (اختيارية)</h2>
+      <p class="note" style="margin-top:0">أضف الوثائق والأرقام المرجعية التي تقابل بها النص: تقرير، نتائج رسمية، بلاغ سابق، أو مقال آخر عن الواقعة نفسها. تعرض الأداة هذه المراجع على النموذج عند التحليل (ونصها إن ألصقته، فيقابله بالنص حرفيا)، وتتيح لك ربط كل مرجع بالمقطع الذي يخصه، فتنتقل المؤشرات المقارنة من "بانتظار المرجع" إلى قابلة للاعتماد. تحفظ المراجع في متصفحك فقط ولا ترسل إلى أحد.</p>
+      <div class="refs" id="reflist"></div>
+      <div class="grid">
+        <label>عنوان المرجع<input type="text" id="r-title" placeholder="مثال: نتائج الانتخابات، وزارة الداخلية"></label>
+        <label>رابطه<input type="text" id="r-link" inputmode="url" dir="ltr" placeholder="https://"></label>
+        <label>ما يثبته أو الرقم المرجعي<input type="text" id="r-note" placeholder="مثال: نسبة المشاركة 38.08%"></label>
+      </div>
+      <label style="margin-top:12px">نص المرجع أو مقطع منه (اختياري، ليقابل به النموذج النص حرفيا)
+        <textarea id="r-text" rows="4" placeholder="الصق المقطع ذا الصلة من التقرير أو البلاغ أو النتائج، أو ارفع ملفا نصيا"></textarea></label>
+      <div class="row" style="margin-top:8px"><label style="flex-direction:row;align-items:center;gap:6px"><span>ملف نصي للمرجع</span><input type="file" id="r-file" accept=".txt,.md,text/plain"></label></div>
+      <div class="row" style="margin-top:10px"><button id="r-add">أضف المرجع</button></div>
+    </div>
+  </section>
+
+  <section id="results"></section>
+  <footer class="note" style="margin-top:32px;border-top:1px solid var(--line);padding-top:14px">
+    الأداة مساعدة للقارئ وليست حكما. المؤشرات اقتراحات تقوم على قرائن لفظية وتحتاج تأكيدك، ولا تثبت وجود نية ولا كذب. <a href="about.html">المنهج والحدود</a> | <a href="terms.html">شروط الاستعمال</a> | <a href="public.html">النتائج المفتوحة وراسلنا</a>
+    <br>إصدار المحرك <span id="ver"></span> بناء على دراسة الباحث هشام الخضير، وباستعمال تقنيات الذكاء الاصطناعي لتحليل المعطيات.
+  </footer>
+</div>
+
+<script src="config.js"></script>
+<script src="mode.js"></script>
+<script src="auth.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data:; font-src 'self'; connect-src 'self' https:; frame-src https://accounts.google.com/gsi/; object-src 'none'; base-uri 'none'; form-action 'self'">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232B4A9B'/%3E%3Cpath d='M16 4l3.2 6.4L26 8.5l-1.9 6.8L28 16l-3.9.7L26 23.5l-6.8-1.9L16 28l-3.2-6.4L6 23.5l1.9-6.8L4 16l3.9-.7L6 8.5l6.8 1.9z' fill='%23fff'/%3E%3C/svg%3E">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>النتائج المفتوحة</title>
+<link rel="stylesheet" href="style.css">
+<style>main{max-width:960px;margin:0 auto;padding:24px 0 64px}main h2{margin:28px 0 8px}.bar2{display:inline-block;height:8px;border-radius:99px;background:var(--flag);vertical-align:middle}.hp{position:absolute;inset-inline-start:-9999px;width:1px;height:1px;overflow:hidden}</style>
+</head>
+<body style="padding-inline:16px">
+<main>
+<nav class="topnav" aria-label="التنقل"><a href="index.html">الأداة</a><a href="dalil-alistikhdam.pdf" download class="pdf">دليل الاستخدام (PDF)</a><a href="public.html" aria-current="page">النتائج المفتوحة</a><a href="about.html">عن الأداة</a></nav>
+
+<h1>النتائج المفتوحة</h1>
+<p class="note" style="max-width:70ch">مشروع معرفي مفتوح: تجمع هذه الصفحة قرارات المستعملين الذين وافقوا على إرسالها مجهولة، وتعرضها للجميع في كل وقت. تبين أي القرائن تؤكدها قراءات الناس وأيها يرفضونها، وتستعمل لمعايرة المحرك بعد مراجعة الباحث. لا تحتوي نصوصا ولا روابط ولا منابر.</p>
+<div id="state" class="banner" style="margin:12px 0">جاري التحميل...</div>
+
+<section id="data" hidden>
+  <div class="stats" id="tiles"></div>
+  <div class="row" style="margin-bottom:12px"><a id="dl-csv" href="#" class="tag">تنزيل البيانات المفتوحة (CSV)</a><a id="dl-json" href="#" class="tag">تنزيل البيانات المفتوحة (JSON)</a></div>
+
+  <h2>القرارات بحسب المؤشر</h2>
+  <div class="card"><div class="scroll"><table id="t-ind"><thead><tr><th>المؤشر</th><th>أكد</th><th>رفض</th><th>أضيف يدويا</th><th>نسبة الرفض</th></tr></thead><tbody></tbody></table></div></div>
+
+  <h2>القرائن</h2>
+  <p class="note">نسبة الرفض العالية مع عدد كاف من القرارات تعني أن القرينة تنتج إنذارات كاذبة. لا تعرض القرينة هنا قبل قرارات من 3 مساهمات مستقلة، ولا تعد القرينة موثوقة إلا إذا جاءت قراراتها من 5 مساهمات مستقلة على الأقل، وتعد قبل ذلك "أولية" ولا يبنى عليها تعديل. يعرض بجانب النسبة مجال يبين مدى عدم اليقين، وهو يتسع كلما قلت القرارات. وهذه النسب أحكام قراء لا حقائق مثبتة.</p>
+  <div class="row" style="margin-bottom:8px"><label style="min-width:240px">بحث في القرائن<input type="text" id="q" placeholder="اكتب جزءا من قرينة"></label>
+    <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="only5"><span>5 مساهمات مستقلة فأكثر فقط</span></label></div>
+  <div class="card"><div class="scroll"><table id="t-cue"><thead><tr><th>المؤشر</th><th>القرينة</th><th>أكد</th><th>رفض</th><th>مساهمات مستقلة</th><th>نسبة الرفض (مجال 95%)</th><th>الحالة</th></tr></thead><tbody></tbody></table></div></div>
+</section>
+
+<h2>راسل الموقع</h2>
+<p class="note">ملاحظة على مؤشر أو قرينة، أو تنبيه إلى إنذار كاذب، أو اقتراح. تصل الرسالة إلى مسؤول الموقع ولا تنشر. بريدك اختياري، اتركه فارغا إن لم تنتظر ردا.</p>
+<form id="f" class="card" style="display:grid;gap:10px">
+  <label>رسالتك<textarea id="f-text" rows="5" maxlength="1000" required></textarea></label>
+  <label>وسيلة رد أخرى (اختيارية)<input type="text" id="f-contact" maxlength="120" placeholder="إن أردت غير بريد حسابك"></label>
+  <div class="hp" aria-hidden="true"><label>لا تملأ هذا الحقل<input type="text" id="f-web" tabindex="-1" autocomplete="off"></label></div>
+  <div class="row"><button class="primary" type="submit" id="f-go">أرسل</button><span id="f-msg" class="note" aria-live="polite"></span></div>
+</form>
+<footer class="note" style="margin-top:32px;border-top:1px solid var(--line);padding-top:14px">إصدار المحرك بناء على دراسة الباحث هشام الخضير، وباستعمال تقنيات الذكاء الاصطناعي لتحليل المعطيات.</footer>
+</main>
+<script src="config.js"></script>
+<script src="mode.js"></script>
+<script src="auth.js"></script>
+<script src="public.js"></script>
+</body>
+</html>
